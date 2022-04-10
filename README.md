@@ -57,7 +57,7 @@ It is also possible to modify a ToDo item, as shown in the following example, us
 # Modify title of item with ordinal 1
 retodos update 1 --title "Do work"
 
-# Modify due date of item with ordinal 1
+# Modify due date of item with ordinal 3
 retodos update 3 --due-date "10:00"
 
 retodos list # Prints...
