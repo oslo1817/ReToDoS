@@ -50,3 +50,18 @@ retodos delete --all
 retodos list # Prints...
 # No ToDos. All done!
 ```
+
+It is also possible to modify a ToDo item, as shown in the following example, using the items added in the first example.
+
+```bash
+# Modify title of item with ordinal 1
+retodos update 1 --title "Do work"
+
+# Modify due date of item with ordinal 1
+retodos update 3 --due-date "10:00"
+
+retodos list # Prints...
+# 1. Call mom (Due by 10:00, 10.04.2022)
+# 2. Do work (Due by 19:00, 10.04.2022)
+# 3. Buy milk (Due by 09:00, 11.04.2022)
+```
