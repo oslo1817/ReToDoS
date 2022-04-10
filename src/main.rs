@@ -67,7 +67,7 @@ impl ToDoItem {
     /// Creates a new [ToDoItem] from a title and a due date.
     fn from(title: &String, due_date: &String) -> Result<Self, DateError> {
         let title = title.to_string();
-        let due_date = parse_date_string(due_date, Utc::now(), Dialect::Us)?;
+        let due_date = parse_date_string(due_date, Local::now(), Dialect::Uk)?.with_timezone(&Utc);
 
         Ok(Self { title, due_date })
     }
