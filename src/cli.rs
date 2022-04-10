@@ -10,6 +10,15 @@ pub struct Cli {
 /// The allowed subcommands for the CLI.
 #[derive(clap::Subcommand)]
 pub enum Command {
+    /// Add a new ToDo item to the list.
+    Add {
+        /// The title of the ToDo item.
+        title: String,
+
+        /// The due date of the ToDo item.
+        due_date: String,
+    },
+
     /// Show and manage the connection to Redis.
     Redis {
         #[clap(subcommand)]
