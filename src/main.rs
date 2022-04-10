@@ -15,6 +15,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             manager.add_item(&ToDoItem::from(title, due_date)?)?;
         }
 
+        Command::Delete { ordinal } => {
+            let items = manager.get_items()?;
+            let item = items.get(*ordinal - 1);
+
+            manager.delete_item(item.unwrap())?;
+
+            println!("Deleted \"{}\"", item.unwrap().title);
+        }
+
         Command::List => {
             let mut ordinal = 1;
 

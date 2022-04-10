@@ -19,6 +19,12 @@ pub enum Command {
         due_date: String,
     },
 
+    /// Delete a ToDo item from the list (i.e. complete the task).
+    Delete {
+        /// The number as shown by `retodos list` of the ToDo item to delete.
+        ordinal: usize,
+    },
+
     /// List all ToDo items.
     List,
 
