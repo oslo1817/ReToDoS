@@ -37,6 +37,24 @@ impl Manager {
         Ok(())
     }
 
+    pub fn get_items(&mut self) -> RedisResult<Vec<ToDoItem>> {
+        self.get_item_keys()?
+            .iter()
+            .map(|key| self.get_item(key))
+            .collect()
+    }
+
+    pub fn get_item(&mut self, key: &String) -> RedisResult<ToDoItem> {
+        redis::cmd("HGETALL").arg(key).query(self.connect()?)
+    }
+
+    /// Queries the keys of all ToDo items.
+    pub fn get_item_keys(&mut self) -> RedisResult<Vec<String>> {
+        redis::cmd("KEYS")
+            .arg("retodos/items/*")
+            .query(self.connect()?)
+    }
+
     /// Queries information from Redis using `INFO [section]`.
     pub fn get_redis_info(&mut self, section: &String) -> RedisResult<String> {
         Ok(redis::cmd("INFO").arg(section).query(self.connect()?)?)

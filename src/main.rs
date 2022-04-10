@@ -1,7 +1,7 @@
 mod cli;
 mod data;
 
-use chrono::Utc;
+use chrono::{Local, Utc};
 use chrono_english::{parse_date_string, DateError, Dialect};
 use cli::{Command, RedisCommand};
 use data::model::ToDoItem;
@@ -13,6 +13,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     match &cli.command {
         Command::Add { title, due_date } => {
             manager.add_item(&ToDoItem::from(title, due_date)?)?;
+        }
+
+        Command::List => {
+            let mut ordinal = 1;
+
+            manager.get_items()?.iter().for_each(|item| {
+                let title = &item.title;
+                let due_date = &item
+                    .due_date
+                    .with_timezone(&Local)
+                    .format("%H:%M, %d.%m.%Y");
+
+                println!("{}. {} (Due by {})", ordinal, title, due_date);
+                ordinal += 1;
+            });
         }
 
         Command::Redis { command } => match &command {
