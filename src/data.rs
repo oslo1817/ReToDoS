@@ -1,3 +1,5 @@
+pub mod model;
+
 use redis::{Client, Connection, RedisResult};
 
 /// A manager for a connection to a Redis server.
