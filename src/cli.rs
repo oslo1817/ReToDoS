@@ -19,6 +19,9 @@ pub enum Command {
         due_date: String,
     },
 
+    /// List all ToDo items.
+    List,
+
     /// Show and manage the connection to Redis.
     Redis {
         #[clap(subcommand)]

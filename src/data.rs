@@ -31,10 +31,28 @@ impl Manager {
     pub fn add_item(&mut self, item: &ToDoItem) -> RedisResult<()> {
         let mut command = redis::cmd("HSET");
 
-        item.write_to(&mut command, "retodos/items");
+        item.write_to(&mut command, "retodos/items/");
         command.query(self.connect()?)?;
 
         Ok(())
+    }
+
+    pub fn get_items(&mut self) -> RedisResult<Vec<ToDoItem>> {
+        self.get_item_keys()?
+            .iter()
+            .map(|key| self.get_item(key))
+            .collect()
+    }
+
+    pub fn get_item(&mut self, key: &String) -> RedisResult<ToDoItem> {
+        redis::cmd("HGETALL").arg(key).query(self.connect()?)
+    }
+
+    /// Queries the keys of all ToDo items.
+    pub fn get_item_keys(&mut self) -> RedisResult<Vec<String>> {
+        redis::cmd("KEYS")
+            .arg("retodos/items/*")
+            .query(self.connect()?)
     }
 
     /// Queries information from Redis using `INFO [section]`.
@@ -54,6 +72,6 @@ impl ToDoItem {
 
         command.arg(key);
         command.arg("title").arg(&self.title);
-        command.arg("due_data").arg(self.due_date.to_rfc3339());
+        command.arg("due_date").arg(self.due_date.to_rfc3339());
     }
 }
