@@ -29,29 +29,46 @@ impl Manager {
 
     /// Adds the supplied [item] to the list of ToDo items.
     pub fn add_item(&mut self, item: &ToDoItem) -> RedisResult<()> {
+        self.add_item_hash(item)?;
+        self.add_item_index(item)
+    }
+
+    /// Adds the supplied [item] as hash to the list of ToDo items.
+    fn add_item_hash(&mut self, item: &ToDoItem) -> RedisResult<()> {
         let mut command = redis::cmd("HSET");
 
         item.write_to(&mut command, "retodos/items/");
-        command.query(self.connect()?)?;
-
-        Ok(())
+        command.query(self.connect()?)
     }
 
+    /// Adds the supplied [item] to the index of ToDo items.
+    fn add_item_index(&mut self, item: &ToDoItem) -> RedisResult<()> {
+        redis::cmd("ZADD")
+            .arg("retodos/items/index")
+            .arg(item.due_date.timestamp())
+            .arg(item.get_default_hash())
+            .query(self.connect()?)
+    }
+
+    /// Query the sorted list of ToDo items.
     pub fn get_items(&mut self) -> RedisResult<Vec<ToDoItem>> {
-        self.get_item_keys()?
+        self.get_item_indices()?
             .iter()
-            .map(|key| self.get_item(key))
+            .map(|key| self.get_item(&format!("retodos/items/{}", key)))
             .collect()
     }
 
+    /// Query the ToDo item at the specified [key].
     pub fn get_item(&mut self, key: &String) -> RedisResult<ToDoItem> {
         redis::cmd("HGETALL").arg(key).query(self.connect()?)
     }
 
-    /// Queries the keys of all ToDo items.
-    pub fn get_item_keys(&mut self) -> RedisResult<Vec<String>> {
-        redis::cmd("KEYS")
-            .arg("retodos/items/*")
+    /// Queries the index (i.e. the hash value) of each ToDo item.
+    pub fn get_item_indices(&mut self) -> RedisResult<Vec<String>> {
+        redis::cmd("ZRANGE")
+            .arg("retodos/items/index")
+            .arg(0)
+            .arg(-1)
             .query(self.connect()?)
     }
 
@@ -64,14 +81,19 @@ impl Manager {
 impl ToDoItem {
     /// Writes the item to the supplied [command] with the specified [prefix].
     fn write_to(&self, command: &mut Cmd, prefix: &str) {
-        use std::collections::hash_map::DefaultHasher;
-        let mut hasher = DefaultHasher::new();
-
-        self.hash(&mut hasher);
-        let key = format!("{}{}", prefix, hasher.finish());
+        let key = format!("{}{}", prefix, self.get_default_hash());
 
         command.arg(key);
         command.arg("title").arg(&self.title);
         command.arg("due_date").arg(self.due_date.to_rfc3339());
+    }
+
+    /// Computes a hash value with [std::collections::hash_map::DefaultHasher].
+    fn get_default_hash(&self) -> u64 {
+        use std::collections::hash_map::DefaultHasher;
+        let mut hasher = DefaultHasher::new();
+
+        self.hash(&mut hasher);
+        hasher.finish()
     }
 }
