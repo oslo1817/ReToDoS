@@ -10,4 +10,5 @@ edition = "2021"
 [dependencies]
 clap = { version = "3.1.8", features = ["derive"] }
 chrono = "0.4.19"
+chrono-english = "0.1.7"
 redis = "0.21.5"
