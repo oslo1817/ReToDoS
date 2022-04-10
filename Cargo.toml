@@ -1,5 +1,7 @@
 [package]
 name = "retodos"
+description = "Manage your ToDos stored in Redis."
+
 version = "0.1.0"
 edition = "2021"
 
