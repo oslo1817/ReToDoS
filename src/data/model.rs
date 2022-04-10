@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use redis::{from_redis_value, FromRedisValue, RedisResult, Value};
+use redis::{from_redis_value, FromRedisValue, RedisResult, ToRedisArgs, Value};
 use std::collections::hash_map::HashMap;
 
 /// A ToDo item with a title and due date.
@@ -22,5 +22,18 @@ impl FromRedisValue for ToDoItem {
             .with_timezone(&Utc);
 
         Ok(ToDoItem { title, due_date })
+    }
+}
+
+impl ToRedisArgs for ToDoItem {
+    fn write_redis_args<W>(&self, out: &mut W)
+    where
+        W: ?Sized + redis::RedisWrite,
+    {
+        "title".write_redis_args(out);
+        self.title.write_redis_args(out);
+
+        "due_date".write_redis_args(out);
+        self.due_date.to_rfc3339().write_redis_args(out);
     }
 }

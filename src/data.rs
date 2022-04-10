@@ -1,7 +1,7 @@
 pub mod model;
 
 use model::ToDoItem;
-use redis::{Client, Cmd, Connection, RedisResult};
+use redis::{Client, Connection, RedisResult};
 use std::hash::{Hash, Hasher};
 
 /// A manager for a connection to a Redis server.
@@ -35,10 +35,10 @@ impl Manager {
 
     /// Adds the supplied [item] as hash to the list of ToDo items.
     fn add_item_hash(&mut self, item: &ToDoItem) -> RedisResult<()> {
-        let mut command = redis::cmd("HSET");
-
-        item.write_to(&mut command, "retodos/items/");
-        command.query(self.connect()?)
+        redis::cmd("HSET")
+            .arg(format!("retodos/items/{}", item.get_default_hash()))
+            .arg(item)
+            .query(self.connect()?)
     }
 
     /// Adds the supplied [item] to the index of ToDo items.
@@ -54,7 +54,7 @@ impl Manager {
     pub fn get_items(&mut self) -> RedisResult<Vec<ToDoItem>> {
         self.get_item_indices()?
             .iter()
-            .map(|key| self.get_item(&format!("retodos/items/{}", key)))
+            .map(|index| self.get_item(&format!("retodos/items/{}", index)))
             .collect()
     }
 
@@ -79,15 +79,6 @@ impl Manager {
 }
 
 impl ToDoItem {
-    /// Writes the item to the supplied [command] with the specified [prefix].
-    fn write_to(&self, command: &mut Cmd, prefix: &str) {
-        let key = format!("{}{}", prefix, self.get_default_hash());
-
-        command.arg(key);
-        command.arg("title").arg(&self.title);
-        command.arg("due_date").arg(self.due_date.to_rfc3339());
-    }
-
     /// Computes a hash value with [std::collections::hash_map::DefaultHasher].
     fn get_default_hash(&self) -> u64 {
         use std::collections::hash_map::DefaultHasher;
