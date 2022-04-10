@@ -38,6 +38,19 @@ pub enum Command {
         #[clap(subcommand)]
         command: RedisCommand,
     },
+
+    Update {
+        /// The number as shown by `retodos list` of the ToDo item to update.
+        ordinal: usize,
+
+        /// The new title of the ToDo item.
+        #[clap(long, short)]
+        title: Option<String>,
+
+        /// The new due date of the ToDo item.
+        #[clap(long, short)]
+        due_date: Option<String>,
+    },
 }
 
 /// The allowed subcommands for the Redis command.
