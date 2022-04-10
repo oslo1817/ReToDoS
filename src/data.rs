@@ -31,7 +31,7 @@ impl Manager {
     pub fn add_item(&mut self, item: &ToDoItem) -> RedisResult<()> {
         let mut command = redis::cmd("HSET");
 
-        item.write_to(&mut command, "retodos/items");
+        item.write_to(&mut command, "retodos/items/");
         command.query(self.connect()?)?;
 
         Ok(())
@@ -54,6 +54,6 @@ impl ToDoItem {
 
         command.arg(key);
         command.arg("title").arg(&self.title);
-        command.arg("due_data").arg(self.due_date.to_rfc3339());
+        command.arg("due_date").arg(self.due_date.to_rfc3339());
     }
 }
