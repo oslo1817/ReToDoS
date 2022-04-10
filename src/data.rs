@@ -50,6 +50,27 @@ impl Manager {
             .query(self.connect()?)
     }
 
+    /// Deletes the supplied [item] from the list of ToDo items.
+    pub fn delete_item(&mut self, item: &ToDoItem) -> RedisResult<()> {
+        self.delete_item_hash(item)?;
+        self.delete_item_index(item)
+    }
+
+    /// Deletes the hash of the supplied [item] from the list of ToDo items.
+    fn delete_item_hash(&mut self, item: &ToDoItem) -> RedisResult<()> {
+        redis::cmd("DEL")
+            .arg(format!("retodos/items/{}", item.get_default_hash()))
+            .query(self.connect()?)
+    }
+
+    /// Deletes the supplied [item] from the index of ToDo items.
+    fn delete_item_index(&mut self, item: &ToDoItem) -> RedisResult<()> {
+        redis::cmd("ZREM")
+            .arg("retodos/items/index")
+            .arg(item.get_default_hash())
+            .query(self.connect()?)
+    }
+
     /// Query the sorted list of ToDo items.
     pub fn get_items(&mut self) -> RedisResult<Vec<ToDoItem>> {
         self.get_item_indices()?
