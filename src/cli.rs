@@ -30,7 +30,7 @@ pub enum Command {
         ordinal: Option<usize>,
     },
 
-    /// List all ToDo items.
+    /// Show all ToDo items in the list.
     List,
 
     /// Show and manage the connection to Redis.
@@ -39,6 +39,7 @@ pub enum Command {
         command: RedisCommand,
     },
 
+    /// Update a ToDo item in the list.
     Update {
         /// The number as shown by `retodos list` of the ToDo item to update.
         ordinal: usize,
