@@ -13,6 +13,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     match &cli.command {
         Command::Add { title, due_date } => {
             manager.add_item(&ToDoItem::from(title, due_date)?)?;
+            println!("Added: \"{}\"", title);
         }
 
         Command::Delete { all, ordinal } => {
@@ -32,18 +33,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
 
         Command::List => {
-            let mut ordinal = 1;
+            let items = manager.get_items()?;
 
-            manager.get_items()?.iter().for_each(|item| {
-                let title = &item.title;
-                let due_date = &item
-                    .due_date
-                    .with_timezone(&Local)
-                    .format("%H:%M, %d.%m.%Y");
+            if items.is_empty() {
+                println!("No ToDos. All done!");
+            } else {
+                let mut ordinal = 1;
 
-                println!("{}. {} (Due by {})", ordinal, title, due_date);
-                ordinal += 1;
-            });
+                items.iter().for_each(|item| {
+                    let title = &item.title;
+                    let due_date = &item
+                        .due_date
+                        .with_timezone(&Local)
+                        .format("%H:%M, %d.%m.%Y");
+
+                    println!("{}. {} (Due by {})", ordinal, title, due_date);
+                    ordinal += 1;
+                });
+            }
         }
 
         Command::Redis { command } => match &command {
