@@ -34,18 +34,18 @@ retodos list # Prints...
 # 3. Call mom (Due by 11:30, 22.04.2022)
 ```
 
-The next example demonstrates how to remove items from the to-do list (based on the list from above).
+The next example demonstrates how to delete items from the to-do list (based on the list from above).
 
 ```bash
-# Remove item with ordinal 2
-retodos remove 2
+# Delete item with ordinal 2
+retodos delete 2
 
 retodos list # Prints...
 # 1. Do homework (Due by 19:00, 10.04.2022)
 # 3. Call mom (Due by 11:30, 22.04.2022)
 
-# Remove all items
-retodos remove --all
+# Delete all items
+retodos delete --all
 
 retodos list # Prints...
 # No ToDos. All done!
