@@ -9,8 +9,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match &cli.command {
         Command::Redis { command } => match &command {
-            RedisCommand::Info => {
-                println!("{}", manager.get_redis_server_info()?);
+            RedisCommand::Info { section } => {
+                println!("{}", manager.get_redis_info(section)?);
             }
         },
     }

@@ -23,8 +23,8 @@ impl Manager {
         Ok(self.connection.as_mut().unwrap())
     }
 
-    /// Queries the Redis server information (using `INFO server`).
-    pub fn get_redis_server_info(&mut self) -> RedisResult<String> {
-        Ok(redis::cmd("INFO").arg("server").query(self.connect()?)?)
+    /// Queries information from Redis using `INFO [section]`.
+    pub fn get_redis_info(&mut self, section: &String) -> RedisResult<String> {
+        Ok(redis::cmd("INFO").arg(section).query(self.connect()?)?)
     }
 }

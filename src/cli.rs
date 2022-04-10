@@ -21,7 +21,11 @@ pub enum Command {
 #[derive(clap::Subcommand)]
 pub enum RedisCommand {
     /// Show details about the Redis server.
-    Info,
+    Info {
+        /// The section of the Redis info to show.
+        #[clap(default_value = "server")]
+        section: String,
+    },
 }
 
 /// Parses the command line arguments and returns the result.
