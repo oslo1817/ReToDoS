@@ -21,8 +21,13 @@ pub enum Command {
 
     /// Delete a ToDo item from the list (i.e. complete the task).
     Delete {
+        /// Delete all ToDo items. If present, ORDINAL is ignored.
+        #[clap(long, short)]
+        all: bool,
+
         /// The number as shown by `retodos list` of the ToDo item to delete.
-        ordinal: usize,
+        #[clap(required_unless_present("all"))]
+        ordinal: Option<usize>,
     },
 
     /// List all ToDo items.

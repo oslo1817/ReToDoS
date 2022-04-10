@@ -15,13 +15,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             manager.add_item(&ToDoItem::from(title, due_date)?)?;
         }
 
-        Command::Delete { ordinal } => {
+        Command::Delete { all, ordinal } => {
             let items = manager.get_items()?;
-            let item = items.get(*ordinal - 1);
 
-            manager.delete_item(item.unwrap())?;
+            if *all {
+                for item in items.iter() {
+                    manager.delete_item(item)?;
+                }
 
-            println!("Deleted \"{}\"", item.unwrap().title);
+                println!("Deleted all items.");
+            } else {
+                let item = items.get(ordinal.unwrap() - 1);
+                manager.delete_item(item.unwrap())?;
+                println!("Deleted \"{}\".", item.unwrap().title);
+            }
         }
 
         Command::List => {
