@@ -26,9 +26,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 println!("Deleted all items.");
             } else {
-                let item = items.get(ordinal.unwrap() - 1);
-                manager.delete_item(item.unwrap())?;
-                println!("Deleted \"{}\".", item.unwrap().title);
+                let ordinal = ordinal.unwrap_or(0);
+                let item = ordinal.checked_sub(1).and_then(|i| items.get(i));
+
+                if let Some(item) = item {
+                    manager.delete_item(item)?;
+                    println!("Deleted \"{}\".", item.title);
+                } else {
+                    Err(format!("No item at ordinal {}.", ordinal))?;
+                }
             }
         }
 
