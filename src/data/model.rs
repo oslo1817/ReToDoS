@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use redis::{from_redis_value, FromRedisValue, RedisResult, ToRedisArgs, Value};
+use redis::{from_redis_value, FromRedisValue, ToRedisArgs, Value};
 use std::collections::hash_map::HashMap;
 
 /// A ToDo item with a title and due date.
@@ -13,7 +13,7 @@ pub struct ToDoItem {
 }
 
 impl FromRedisValue for ToDoItem {
-    fn from_redis_value(value: &Value) -> RedisResult<ToDoItem> {
+    fn from_redis_value(value: Value) -> Result<ToDoItem, redis::ParsingError> {
         let map: HashMap<String, String> = from_redis_value(value)?;
 
         let title = map.get("title").unwrap().to_string();
